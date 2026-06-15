@@ -1,0 +1,346 @@
+import { Timestamp } from 'firebase/firestore';
+
+export interface FirestoreDocument {
+  id: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export type ApplicationSource =
+  | 'LinkedIn'
+  | 'Indeed'
+  | 'Glassdoor'
+  | 'Naukri'
+  | 'Company Website'
+  | 'Referral'
+  | 'Other';
+
+export interface Application {
+  id: string;
+  company: string;
+  role: string;
+  link: string;
+  date: string;
+  status: ApplicationStatus;
+  source: ApplicationSource;
+  sourceOther?: string;
+  recruiter: string;
+  referral: 'Y' | 'N';
+  location: string;
+  notes: string;
+  jobDescription?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  salaryRange?: string;
+  priority?: 'High' | 'Medium' | 'Low';
+  interviewDate?: string;
+  archived?: boolean;
+}
+
+export interface Resource {
+  url: string;
+  title: string;
+  completed: boolean;
+}
+
+export interface PrepEntry {
+  id:string;
+  date: string;
+  resources: Resource[];
+  time: number;
+  confidence: number; // Stays as a number from 1-5
+  notes: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  linkedApplicationId?: string; // Optional link to an application
+  srsStage?: number;
+  nextReviewDate?: string;
+  subjectId: string;
+}
+
+export interface CompanyResearch {
+  id: string;
+  company: string;
+  whatTheyDo: string;
+  values: string;
+  why: string;
+  questions: string;
+  news: string;
+  date: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface NetworkingContact {
+  id: string;
+  name: string;
+  company: string;
+  role: string;
+  date: string;
+  status: string;
+  referral: 'Y' | 'N';
+  notes: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface StarStory {
+  id: string;
+  title: string;
+  situation: string;
+  task: string;
+  action: string;
+  result: string;
+  date: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export type ApplicationStatus = 
+  | 'To Apply'
+  | 'Applied'
+  | 'HR Screen'
+  | 'Tech Screen'
+  | 'Round 1'
+  | 'Round 2'
+  | 'Manager Round'
+  | 'Final Round'
+  | 'Offer'
+  | 'Rejected'
+  | 'Ghosted';
+
+export type ResourceCategory = 
+  | 'Documents'
+  | 'Portfolio' 
+  | 'Credentials'
+  | 'Profiles'
+  | 'Learning'
+  | 'Tools';
+
+export interface VaultResource {
+  id: string;
+  title: string;
+  url: string;
+  description: string;
+  category: ResourceCategory;
+  tags: string[];
+  isPublic: boolean;
+  isFavorite: boolean;
+  lastAccessed?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export type ProblemPlatform = 'LeetCode' | 'NeetCode' | 'HackerRank' | 'Other';
+export type ProblemDifficulty = 'Easy' | 'Medium' | 'Hard';
+export type ProblemStatus = 'Todo' | 'Solved' | 'Attempted' | 'Revision Needed';
+
+export interface CodingProblem {
+  id: string;
+  title: string;
+  platform: ProblemPlatform;
+  difficulty: ProblemDifficulty;
+  link: string;
+  status: ProblemStatus;
+  notes: string;
+  tags: string[]; // e.g., "Arrays", "DP"
+  solvedDate?: string;
+  timeSpent?: number; // in minutes
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export type EditableItem = Application | PrepEntry | CompanyResearch | NetworkingContact | StarStory | VaultResource | CodingProblem;
+
+export interface NotePage {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  color: string;
+  tags: string[];
+  pinned: boolean;
+}
+
+export interface UserNotes {
+  id: string;
+  pages: NotePage[];
+  settings: {
+    defaultColor: string;
+    showPreview: boolean;
+    fontSize: number;
+    theme: 'light' | 'dark' | 'auto';
+  };
+}
+
+export interface Subject {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SubjectFirestore {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export type TabType = 'applications' | 'prep' | 'research' | 'networking' | 'star' | 'vault' | 'problem';
+
+export interface Goal extends FirestoreDocument {
+  type: 'weekly' | 'monthly';
+  applications: number;
+  networking: number;
+  prep: number;
+}
+
+export interface OnboardingStep {
+  id: string;
+  title: string;
+  description: string;
+  component?: string;
+  completed: boolean;
+}
+
+export interface QuickStartTask {
+  id: string;
+  title: string;
+  description: string;
+  actionText: string;
+  completed: boolean;
+  feature: TabType;
+  icon: string;
+}
+
+export interface UserOnboarding {
+  hasCompletedWelcome: boolean;
+  hasSeenTooltips: boolean;
+  completedSteps: string[];
+  quickStartTasks: QuickStartTask[];
+  demoMode: boolean;
+  createdAt: string;
+  lastActiveStep?: string;
+}
+
+export interface TooltipConfig {
+  id: string;
+  targetSelector: string;
+  title: string;
+  content: string;
+  placement: 'top' | 'bottom' | 'left' | 'right';
+  feature: TabType;
+  priority: number;
+}
+
+export type OnboardingStatus = 'not-started' | 'in-progress' | 'completed';
+
+// User Profile Data Collection
+export interface UserProfile {
+  name: string;
+  ageRange: '18-25' | '26-35' | '36-45' | '46-55' | '56+';
+  gender: 'Male' | 'Female' | 'Other' | 'Prefer not to say';
+  country?: string;
+  publicUsername?: string;
+  profileCompleted: boolean;
+  profileCompletedAt?: Timestamp;
+}
+
+// Analytics Data Structures
+export interface AnalyticsOverview {
+  totalUsers: number;
+  lastUpdated: Timestamp;
+}
+
+export interface AnalyticsDemographics {
+  gender: {
+    male: number;
+    female: number;
+    other: number;
+    preferNotToSay: number;
+  };
+  ageRanges: {
+    '18-25': number;
+    '26-35': number;
+    '36-45': number;
+    '46-55': number;
+    '56+': number;
+  };
+  countries: Record<string, number>;
+  lastUpdated: Timestamp;
+}
+
+// Enhanced Analytics - Event Tracking
+export interface AnalyticsEvents {
+  // User Lifecycle & Onboarding
+  signUps: number;
+  logins: number;
+  onboardingStarted: number;
+  onboardingStepsCompleted: Record<string, number>; // step_name -> count
+  demoModeEnabled: number;
+  
+  // Core Feature Engagement
+  applicationsCreated: number;
+  applicationStatusChanges: Record<string, number>; // status -> count
+  jobDescriptionsSaved: number;
+  prepEntriesCreated: number;
+  starStoriesCreated: number;
+  companyResearchCreated: number;
+  networkingContactsCreated: number;
+  
+  // Productivity & QOL Features
+  commandPaletteOpened: number;
+  commandPaletteActions: Record<string, number>; // action_type -> count
+  themeChanges: Record<string, number>; // theme_name -> count
+  keyboardShortcutsUsed: Record<string, number>; // shortcut_name -> count
+  
+  // User Outcomes & Success Metrics
+  goalsSet: number;
+  applicationOffersReceived: number;
+  dataExported: number;
+  
+  lastUpdated: Timestamp;
+}
+
+// Event tracking interfaces for type safety
+export interface AnalyticsEvent {
+  eventType: string;
+  userId?: string;
+  parameters?: Record<string, string | number>;
+  timestamp: Timestamp;
+}
+
+export type EventType = 
+  // User Lifecycle
+  | 'sign_up'
+  | 'login' 
+  | 'onboarding_started'
+  | 'onboarding_step_completed'
+  | 'demo_mode_enabled'
+  // Core Features
+  | 'application_created'
+  | 'application_status_changed'
+  | 'application_archived'
+  | 'application_unarchived'
+  | 'jd_saved'
+  | 'prep_entry_created'
+  | 'star_story_created'
+  | 'company_research_created'
+  | 'networking_contact_created'
+  | 'vault_resource_created'
+  // Productivity
+  | 'command_palette_opened'
+  | 'command_palette_action'
+  | 'theme_changed'
+  | 'keyboard_shortcut_used'
+  // Success Metrics
+  | 'goal_set'
+  | 'application_offer_received'
+  | 'data_exported';
+
+
+
